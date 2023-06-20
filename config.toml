@@ -1,5 +1,5 @@
-name = "Bastian"
-flag = true
 
-[command.Test]
-number = 42
+flag = true
+name = "my super node"
+peer_id = "0xdeadbeef"
+

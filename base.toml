@@ -1,0 +1,8 @@
+peer_id = "fjf"
+name = "name default"
+flag = false
+
+[tce]
+db_path = "./default-db/"
+boots_peers = ["/dns/boot_peer1/p2p/4000/12dfjfjfjfj..fjfjfj", "/dns/boot_peer2/p2p/4000/1444jfjfjfj..fjfjfj"]
+local_port = 4000
