@@ -1,0 +1,5 @@
+name = "Bastian"
+flag = true
+
+[command.Test]
+number = 42
