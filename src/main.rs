@@ -1,3 +1,4 @@
+use clap::Args;
 use clap::{Parser, Subcommand};
 use figment::error::Kind;
 use figment::providers::Env;
@@ -26,10 +27,14 @@ struct Cli {
 
 #[derive(Subcommand, Debug, Serialize, Deserialize)]
 enum SubCommand {
-    Tce {
-        #[arg(short, long, env = "TCE_LOCAL_PORT")]
-        tce_local_port: Option<u16>,
-    },
+    Tce(Tce),
+}
+
+#[derive(Args, Debug, Serialize, Deserialize)]
+struct Tce {
+    #[arg(short, long, env = "TCE_LOCAL_PORT")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    local_port: Option<u16>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -72,14 +77,17 @@ fn main() {
     let cli = Cli::parse();
 
     println!("{:#?}", cli);
-
-    let config: Config = match Figment::new()
+    let mut figment = Figment::new()
         .merge(Toml::file("base.toml"))
         .merge(Yaml::file("config.yaml"))
         .merge(Env::prefixed("TOPOS_").split("__"))
-        .merge(Serialized::defaults(cli))
-        .extract()
-    {
+        .merge(Serialized::defaults(Cli::parse()));
+
+    figment = match cli.subcmd {
+        SubCommand::Tce(values) => figment.merge(Serialized::defaults(values).key("tce")),
+    };
+
+    let config: Config = match figment.extract() {
         Ok(config) => config,
         Err(figment::Error {
             kind: Kind::MissingField(name),
